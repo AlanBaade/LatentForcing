@@ -21,7 +21,7 @@ Code for Latent Forcing
 Our code is based on JiT: https://github.com/LTH14/JiT.git
 
 <p align="left">
-  <img src="assets/ConceptDiagram.png" width="30%">
+  <img src="assets/ConceptDiagram.png" width="40%">
 </p>
 
 ### Dataset
