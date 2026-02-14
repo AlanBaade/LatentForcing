@@ -75,8 +75,25 @@ To train a Multi-Schedule model set ```--sample_mode shifted_independent_uniform
 
 PyTorch pre-trained models are WIP
 
-Evaluate LatentForcing-L with Autoguidance
-
+Evaluate LatentForcing-L with Autoguidance (Default Evaluation Setting)
+```
+torchrun --nproc_per_node=8 --standalone \
+main_jit.py \
+--model JiTCoT-LM/16 \
+--dh_depth 2 --dh_hidden_size 1024 \
+--gen_bsz 1536 --num_images 50000 \
+--cfg 1.5 --cfg_dino 1.5 \
+--interval_min 0.0 --interval_max 1.0 \
+--interval_min_dino 0.0 --interval_max_dino 1.0 \
+--sample_mode dino_first_cascaded_noised \
+--output_dir ${OUTPUT_DIR_EVAL} \
+--resume ${OUTPUT_DIR} \
+--data_path ${DATA_PATH} \
+--evaluate_gen --num_sampling_steps 50 \
+--sampling_method heun \
+--guidance_method autoguidance \
+--autoguidance_ckpt ${AUTOGUIDANCE_CKPT}$
+```
 
 Evaluate LatentForcing-L with Interval CFG (Used in the System-Level comparison only)
 ```
