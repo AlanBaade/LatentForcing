@@ -44,13 +44,6 @@ uv pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu124
 uv pip install "torch-fidelity @ git+https://github.com/LTH14/torch-fidelity.git@master"
 ```
 
-When you get ```undefined symbol: iJIT_NotifyEvent``` when importing ```torch```, simply
-```
-pip uninstall torch
-pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu124
-```
-Check this [issue](https://github.com/conda/conda/issues/13812#issuecomment-2071445372) for more details.
-
 ### Training
 Example script for training LatentForcing-L on ImageNet 200 epochs:
 
