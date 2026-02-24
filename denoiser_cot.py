@@ -210,7 +210,7 @@ class DenoiserCoT(nn.Module):
         z = [t[i] * x[i] + (1 - t[i]) * e[i] for i in [0,1]]
         v = [(x[i] - z[i]) / (1 - t[i]).clamp_min(self.t_eps) for i in [0,1]]
 
-        x_pred = self.net(z, [t[i].flatten() for i in [0,1]], labels_dropped, m=m)
+        x_pred = self.net(z, [t[i].flatten() for i in [0,1]], labels_dropped)
         v_pred = [(x_pred[i] - z[i]) / (1 - t[i]).clamp_min(self.t_eps) for i in [0,1]]
 
         # l2 loss
@@ -237,20 +237,17 @@ class DenoiserCoT(nn.Module):
             raise NotImplementedError
 
         # ode
-        q = None
         for i in range(self.steps - 1):
-            if q is None and timesteps[i][1].view(-1)[0].item() >= 0.75:
-                q = (z[1], timesteps[i][1])
             t = timesteps[i]
             t_next = timesteps[i + 1]
-            z = stepper(z, t, t_next, labels, q if i < self.steps // 2 else q)
+            z = stepper(z, t, t_next, labels)
         # last step euler
-        z = self._euler_step(z, timesteps[-2], timesteps[-1], labels, q)
+        z = self._euler_step(z, timesteps[-2], timesteps[-1], labels)
         z_pixel, z_dino = z
         return z_pixel
 
     @torch.no_grad()
-    def _forward_sample(self, z, t, labels, q=None):
+    def _forward_sample(self, z, t, labels):
         # conditional
         x_cond = self.net(z, [t[i].flatten() for i in [0,1]], labels)
         v_cond = [(x_cond[i] - z[i]) / (1.0 - t[i]).clamp_min(self.t_eps_inference) for i in [0,1]]
@@ -277,17 +274,17 @@ class DenoiserCoT(nn.Module):
         return [v_uncond[i] + cfg_scale_interval[i] * (v_cond[i] - v_uncond[i]) for i in [0,1]]
 
     @torch.no_grad()
-    def _euler_step(self, z, t, t_next, labels, q):
-        v_pred = self._forward_sample(z, t, labels, q)
+    def _euler_step(self, z, t, t_next, labels):
+        v_pred = self._forward_sample(z, t, labels)
         z_next = [z[i] + (t_next[i] - t[i]) * v_pred[i] for i in [0,1]]
         return z_next
 
     @torch.no_grad()
-    def _heun_step(self, z, t, t_next, labels, q=None):
-        v_pred_t = self._forward_sample(z, t, labels, q)
+    def _heun_step(self, z, t, t_next, labels):
+        v_pred_t = self._forward_sample(z, t, labels)
 
         z_next_euler = [z[i] + (t_next[i] - t[i]) * v_pred_t[i] for i in [0,1]]
-        v_pred_t_next = self._forward_sample(z_next_euler, t_next, labels, q)
+        v_pred_t_next = self._forward_sample(z_next_euler, t_next, labels)
 
         v_pred = [0.5 * (v_pred_t[i] + v_pred_t_next[i]) for i in [0,1]]
         z_next = [z[i] + (t_next[i] - t[i]) * v_pred[i] for i in [0,1]]
