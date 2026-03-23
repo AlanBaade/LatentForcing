@@ -117,6 +117,19 @@ main_jit.py \
 
 We use the same customized FID eval as JiT: [```torch-fidelity```](https://github.com/LTH14/torch-fidelity) 
 
+### Checkpoints
+Checkpoints for LatentForcing-L at 200 Epochs and Autoguidance can be found at [https://huggingface.co/AlanBaade/LatentForcing/tree/main](https://huggingface.co/AlanBaade/LatentForcing/tree/main).
+
+To use a checkpoint for evaluation, create a folder ${OUTPUT_DIR} and rename the model checkpoint to ``checkpoint-last.pth`` in that folder:
+``
+mv lfjit-l-200.pth ${OUTPUT_DIR}/checkpoint-last.pth
+``
+Then use ``--resume ${OUTPUT_DIR}`` as shown in the evaluation code above
+
+For autoguidance, use ``--autoguidance_ckpt /path/to/lfjit-s-dh-40-autoguidance.pth``
+
+Evaluation with 50k steps takes ~35 min on an H100 node. Replicating using this public codebase and Interval CFG, we obtain ``FID: 2.4500, Inception Score: 286.7403``, slightly better performance than reported in the paper.
+
 ### Contact
 
 You can contact me at baade@stanford.edu for questions.
