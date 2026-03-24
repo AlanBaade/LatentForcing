@@ -73,8 +73,6 @@ To train a Multi-Schedule model set ```--sample_mode shifted_independent_uniform
 
 ### Evaluation
 
-PyTorch pre-trained models are WIP
-
 Evaluate LatentForcing-L with Autoguidance (Default Evaluation Setting)
 ```
 torchrun --nproc_per_node=8 --standalone \
